@@ -2,8 +2,8 @@ const express = require('express');
 const fs = require('fs')
 const bcrypt = require('bcrypt')
 const path = require('path')
-const authenticationMiddleWare = require('../middleware/auth')
-
+const authenticationMiddleWareSignUp = require('../middleware/auth')
+const authenticationMiddleWareSignIn = require('../middleware/auth')
 const usersFile = path.resolve(__dirname,'../data/users.json')
 
 const auth = express();
@@ -19,7 +19,7 @@ const creatingUser  = async (username,password,name) =>{
     }
 }
 
-auth.post('/signup',authenticationMiddleWare, (req,res)=>{
+auth.post('/signup',authenticationMiddleWareSignUp, (req,res)=>{
     const {username,password,name} = req.body;
     let usersList;
     fs.readFile(usersFile,"utf-8", async (err,data)=>{
@@ -69,7 +69,7 @@ const verification = async (username,password,usersList) =>{
     return isValid ? true : false;
 }
 
-app.post('/signin',authenticationMiddleWare, (req,res)=>{
+auth.post('/signin',authenticationMiddleWareSignIn, (req,res)=>{
     const username = req.body.username;
     const password = req.body.password;
     let usersList;
