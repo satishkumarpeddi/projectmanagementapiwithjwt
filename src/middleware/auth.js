@@ -1,5 +1,7 @@
 const zod = require('zod');
 const jwt = require('jsonwebtoken')
+const dotenv = require('dotenv')
+const path = require('path')
 const schemaSignUp = zod.object({
     username:zod.string().email(),
     password:zod.string().min(8),
@@ -10,6 +12,12 @@ const schemaSignIn = zod.object({
     username:zod.string().email(),
     password:zod.string().min(8), 
 })
+
+dotenv.config({
+    path:path.resolve(__dirname,'../../.env')
+})
+
+const JWT = process.env.JWT_SECRET;
 
 const validatingInputSignUp = (username,password,name) =>{
     const response = schemaSignUp.safeParse({username,password,name});
@@ -48,7 +56,34 @@ const authenticationMiddleWareSignIn = (req,res,next) => {
         next();
 }
 
+const verificationOfJWT = (req,res,next) => {
+    const authHeader = req.headers.authorization;
+    
+    if(!authHeader) return res.status(404).json({
+        msg:"Authorization token is required"
+    })
+
+    const token = authHeader;
+    
+    if(!token){
+        return res.status(401).json({
+            msg:"Authorization token is required!!"
+        })
+    }
+
+    try{
+        const decoded = jwt.verify(token,JWT);
+        req.user = decoded;
+        next();
+    }catch(err){
+        return res.status(401).json({
+            msg:"Invalid or expired token"
+        })
+    }
+
+}
 
 
 module.exports = authenticationMiddleWareSignUp;
 module.exports = authenticationMiddleWareSignIn;
+module.exports = verificationOfJWT;

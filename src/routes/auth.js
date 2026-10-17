@@ -8,6 +8,7 @@ require('dotenv').config({
 });
 const authenticationMiddleWareSignUp = require('../middleware/auth')
 const authenticationMiddleWareSignIn = require('../middleware/auth')
+const verificationOfJWT = require('../middleware/auth')
 const usersFile = path.resolve(__dirname,'../data/users.json')
 
 const auth = express();
@@ -115,6 +116,12 @@ auth.post('/signin',authenticationMiddleWareSignIn, (req,res)=>{
     })
 
 
+})
+
+auth.get('/protected',verificationOfJWT,(req,res)=>{
+    res.status(200).json({
+        msg:"Access granted!!"
+    })
 })
 
 module.exports = auth;
