@@ -11,7 +11,7 @@ const authenticationMiddleWareSignIn = require('../middleware/auth')
 const verificationOfJWT = require('../middleware/auth')
 const usersFile = path.resolve(__dirname,'../data/users.json')
 
-const auth = express();
+const auth = express.Router();
 
 
 const JWT = process.env.JWT_SECRET;

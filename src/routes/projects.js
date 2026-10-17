@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path')
 const fs = require('fs')
 const authenticationMiddleWareSignIn = require('../middleware/auth')
-const project = express();
+const project = express.Router();
 require('dotenv').config({
     path:path.resolve(__dirname,'../../.env')
 })
@@ -98,8 +98,6 @@ project.use((req,res)=>{
     res.status(404).send("Page not found")
 })
 
-project.listen(PORT,(req,res)=>{
-    console.log(`The servering is running on the ${PORT}`)
-})
+
 
 module.exports = project
