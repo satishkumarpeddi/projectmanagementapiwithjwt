@@ -84,6 +84,9 @@ const verificationOfJWT = (req,res,next) => {
 }
 
 
-module.exports = authenticationMiddleWareSignUp;
-module.exports = authenticationMiddleWareSignIn;
-module.exports = verificationOfJWT;
+
+module.exports = {
+    authenticationMiddleWareSignUp,
+    authenticationMiddleWareSignIn,
+    verificationOfJWT
+};

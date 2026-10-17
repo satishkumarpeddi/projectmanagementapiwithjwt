@@ -6,9 +6,13 @@ const jwt = require('jsonwebtoken')
 require('dotenv').config({
     path:path.resolve(__dirname,'../../.env')
 });
-const authenticationMiddleWareSignUp = require('../middleware/auth')
-const authenticationMiddleWareSignIn = require('../middleware/auth')
-const verificationOfJWT = require('../middleware/auth')
+
+const {
+    authenticationMiddleWareSignUp,
+    authenticationMiddleWareSignIn,
+    verificationOfJWT
+} = require('../middleware/auth');
+
 const usersFile = path.resolve(__dirname,'../data/users.json')
 
 const auth = express.Router();
