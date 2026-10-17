@@ -1,7 +1,9 @@
 const express = require('express');
 const path = require('path')
 const fs = require('fs')
-const authenticationMiddleWareSignIn = require('../middleware/auth')
+const {
+    verificationOfJWT
+} = require('../middleware/auth');
 const project = express.Router();
 require('dotenv').config({
     path:path.resolve(__dirname,'../../.env')
@@ -24,14 +26,14 @@ const removeTodo = (array,index) => {
     return newTodoList;
 }
 
-project.get('/todos',authenticationMiddleWareSignIn,(req,res)=>{
+project.get('/todos',verificationOfJWT,(req,res)=>{
     fs.readFile(filePath,"utf-8",(err,data)=>{
         if(err) throw err;
         res.status(200).send(JSON.parse(data))
     })
 })
 
-project.get('/todos/:id',authenticationMiddleWareSignIn,(req,res)=>{
+project.get('/todos/:id',verificationOfJWT,(req,res)=>{
     fs.readFile(filePath,"utf-8",(err,data)=>{
         if(err) throw err;
         let todos = JSON.parse(data)
@@ -43,7 +45,7 @@ project.get('/todos/:id',authenticationMiddleWareSignIn,(req,res)=>{
     })
 })
 
-project.post('/todos',authenticationMiddleWareSignIn,(req,res)=>{
+project.post('/todos',verificationOfJWT,(req,res)=>{
     let newTodo = {
         id: Math.floor(Math.random()*10000000),
         title:req.body?.title,
@@ -60,7 +62,7 @@ project.post('/todos',authenticationMiddleWareSignIn,(req,res)=>{
     })
 })
 
-project.put('/todos/:id',authenticationMiddleWareSignIn,(req,res)=>{
+project.put('/todos/:id',verificationOfJWT,(req,res)=>{
     fs.readFile(filePath,"utf-8",(err,data)=>{
         if(err) throw err;
         let todos = JSON.parse(data);
@@ -80,7 +82,7 @@ project.put('/todos/:id',authenticationMiddleWareSignIn,(req,res)=>{
     })
 })
 
-project.delete('/todos/:id',authenticationMiddleWareSignIn,(req,res)=>{
+project.delete('/todos/:id',verificationOfJWT,(req,res)=>{
     fs.readFile(filePath,'utf-8',(err,data)=>{
         if(err) throw err;
         let todos = JSON.parse(data);
@@ -94,9 +96,6 @@ project.delete('/todos/:id',authenticationMiddleWareSignIn,(req,res)=>{
     })
 })
 
-project.use((req,res)=>{
-    res.status(404).send("Page not found")
-})
 
 
 
