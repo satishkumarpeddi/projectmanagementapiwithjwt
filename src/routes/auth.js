@@ -1,9 +1,8 @@
 const express = require('express');
-const jwt = require('jsonwebtoken');
-const zod = require('zod');
 const fs = require('fs')
 const bcrypt = require('bcrypt')
 const path = require('path')
+const authenticationMiddleWare = require('../middleware/auth')
 
 const usersFile = path.resolve(__dirname,'../data/users.json')
 
@@ -11,18 +10,6 @@ const auth = express();
 
 auth.use(express.json());
 
-const schema = zod.object({
-    username:zod.string().email(),
-    password:zod.string().min(8),
-    name:zod.string().nonempty(),
-})
-
-const validatingInput = (username,password,name) =>{
-    const response = schema.safeParse({username,password,name});
-    if(response.success)
-        return true;
-    return false
-}
 
 const creatingUser  = async (username,password,name) =>{
     return {
@@ -32,15 +19,9 @@ const creatingUser  = async (username,password,name) =>{
     }
 }
 
-auth.post('/signup', (req,res)=>{
-    const username = req.body.username;
-    const password = req.body.password;
-    const name = req.body.name;
+auth.post('/signup',authenticationMiddleWare, (req,res)=>{
+    const {username,password,name} = req.body;
     let usersList;
-    if(!validatingInput(username,password,name)) 
-        return res.status(400).send({
-            "msg":"Invalid input"
-    }) 
     fs.readFile(usersFile,"utf-8", async (err,data)=>{
         if(err) return res.status(500).send({
             msg:"Internal server error",
@@ -77,6 +58,52 @@ auth.post('/signup', (req,res)=>{
             })
         })
     })
+})
+
+const verification = async (username,password,usersList) =>{ 
+    const user =  usersList.find(user=> user.username==username);
+    if(!user) return false;
+
+    const isValid = await bcrypt.compare(password,user.password);
+    
+    return isValid ? true : false;
+}
+
+app.post('/signin',authenticationMiddleWare, (req,res)=>{
+    const username = req.body.username;
+    const password = req.body.password;
+    let usersList;
+    fs.readFile(usersFile,"utf-8",async (err,data)=>{
+        if(err) return res.status(500).json({
+            msg:"Internal server failuer."
+        })
+
+        try{
+            usersList = JSON.parse(data);
+            if(!Array.isArray(usersList)){
+                return res.status(500).json({
+                    msg:"Invalid user data."
+                })
+            }
+        }catch(err){
+            return res.status(500).json({
+                msg:"Invalid user data"
+            })
+        }
+
+        if(!await verification(username,password,usersList)){
+            return res.status(401).json({
+                msg:"User not found"
+            })
+        }
+
+        res.status(200).json({
+            msg:"User found!!"
+        })
+
+    })
+
+
 })
 
 module.exports = auth;
