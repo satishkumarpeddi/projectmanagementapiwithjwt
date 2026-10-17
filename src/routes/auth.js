@@ -2,11 +2,19 @@ const express = require('express');
 const fs = require('fs')
 const bcrypt = require('bcrypt')
 const path = require('path')
+const jwt = require('jsonwebtoken')
+require('dotenv').config({
+    path:path.resolve(__dirname,'../../.env')
+});
 const authenticationMiddleWareSignUp = require('../middleware/auth')
 const authenticationMiddleWareSignIn = require('../middleware/auth')
 const usersFile = path.resolve(__dirname,'../data/users.json')
 
 const auth = express();
+
+
+const JWT = process.env.JWT_SECRET;
+
 
 auth.use(express.json());
 
@@ -96,9 +104,12 @@ auth.post('/signin',authenticationMiddleWareSignIn, (req,res)=>{
                 msg:"User not found"
             })
         }
+        
+        const token = jwt.sign({username:username},JWT)
 
         res.status(200).json({
-            msg:"User found!!"
+            msg:"User found!!",
+            token
         })
 
     })

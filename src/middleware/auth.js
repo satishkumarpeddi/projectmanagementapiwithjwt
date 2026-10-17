@@ -1,4 +1,5 @@
 const zod = require('zod');
+const jwt = require('jsonwebtoken')
 const schemaSignUp = zod.object({
     username:zod.string().email(),
     password:zod.string().min(8),
@@ -46,6 +47,7 @@ const authenticationMiddleWareSignIn = (req,res,next) => {
     else
         next();
 }
+
 
 
 module.exports = authenticationMiddleWareSignUp;
