@@ -63,7 +63,7 @@ const verificationOfJWT = (req,res,next) => {
         msg:"Authorization token is required"
     })
 
-    const token = authHeader;
+    const token = authHeader.trim();
     
     if(!token){
         return res.status(401).json({
